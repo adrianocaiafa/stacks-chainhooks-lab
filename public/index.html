@@ -251,6 +251,10 @@
           },
           onFinish: (data) => {
             window.userData = data;
+            // Extrai o endereço do perfil
+            if (data.profile && data.profile.stxAddress) {
+              window.userData.address = data.profile.stxAddress.mainnet || data.profile.stxAddress.testnet;
+            }
             updateWalletUI();
             loadChainhooks(); // Recarrega para atualizar botões
           }
