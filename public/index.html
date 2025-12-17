@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chainhooks Manager</title>
-  <script src="https://unpkg.com/@stacks/connect@7/dist/index.umd.js"></script>
-  <script src="https://unpkg.com/@stacks/transactions@6/dist/index.umd.js"></script>
   <style>
     * {
       margin: 0;
@@ -225,35 +223,34 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    // Importa as bibliotecas Stacks
+    import { showConnect, showContractCall } from 'https://cdn.jsdelivr.net/npm/@stacks/connect@7/+esm';
+    import { StacksMainnet, StacksTestnet } from 'https://cdn.jsdelivr.net/npm/@stacks/transactions@6/+esm';
+
+    // Torna as funções disponíveis globalmente
+    window.StacksConnectAPI = { showConnect, showContractCall, StacksMainnet, StacksTestnet };
+
     // Estado da carteira
-    let userData = null;
+    window.userData = null;
 
     // Aguarda as bibliotecas carregarem
-    window.addEventListener('DOMContentLoaded', async () => {
-      // Aguarda um pouco para garantir que os módulos ES carregaram
-      await new Promise(resolve => setTimeout(resolve, 500));
+    window.addEventListener('DOMContentLoaded', () => {
       loadChainhooks();
     });
 
     // Conecta a carteira Stacks
-    async function connectWallet() {
+    window.connectWallet = async function() {
       try {
-        if (typeof window.StacksConnect === 'undefined') {
-          alert('Biblioteca Stacks Connect não carregou. Aguarde alguns segundos e tente novamente.');
-          return;
-        }
-
-        const { showConnect } = window.StacksConnect;
+        const { showConnect } = window.StacksConnectAPI;
         
         await showConnect({
           appDetails: {
             name: 'Chainhooks Manager',
             icon: window.location.origin + '/favicon.ico'
           },
-          redirectTo: '/',
           onFinish: (data) => {
-            userData = data;
+            window.userData = data;
             updateWalletUI();
             loadChainhooks(); // Recarrega para atualizar botões
           }
@@ -262,14 +259,14 @@
         console.error('Erro ao conectar carteira:', error);
         alert('Erro ao conectar carteira: ' + error.message);
       }
-    }
+    };
 
     // Desconecta a carteira
-    function disconnectWallet() {
-      userData = null;
+    window.disconnectWallet = function() {
+      window.userData = null;
       updateWalletUI();
       loadChainhooks(); // Recarrega para atualizar botões
-    }
+    };
 
     // Atualiza a UI da carteira
     function updateWalletUI() {
@@ -277,12 +274,12 @@
       const walletAddress = document.getElementById('wallet-address');
       const connectBtn = document.getElementById('connect-wallet-btn');
 
-      if (userData && userData.address) {
+      if (window.userData && window.userData.address) {
         walletInfo.style.display = 'block';
         connectBtn.style.display = 'none';
-        const shortAddress = userData.address.length > 20 
-          ? userData.address.substring(0, 10) + '...' + userData.address.substring(userData.address.length - 8)
-          : userData.address;
+        const shortAddress = window.userData.address.length > 20 
+          ? window.userData.address.substring(0, 10) + '...' + window.userData.address.substring(window.userData.address.length - 8)
+          : window.userData.address;
         walletAddress.textContent = shortAddress;
       } else {
         walletInfo.style.display = 'none';
@@ -291,21 +288,15 @@
     }
 
     // Chama uma função do contrato
-    async function callContractFunction(contractIdentifier, functionName, network) {
-      if (!userData) {
+    window.callContractFunction = async function(contractIdentifier, functionName, network) {
+      if (!window.userData) {
         alert('Por favor, conecte sua carteira primeiro!');
-        await connectWallet();
+        await window.connectWallet();
         return;
       }
 
       try {
-        if (typeof window.StacksConnect === 'undefined' || typeof window.StacksTransactions === 'undefined') {
-          alert('Bibliotecas Stacks não estão disponíveis. Aguarde alguns segundos e tente novamente.');
-          return;
-        }
-
-        const { showContractCall } = window.StacksConnect;
-        const { StacksMainnet, StacksTestnet } = window.StacksTransactions;
+        const { showContractCall, StacksMainnet, StacksTestnet } = window.StacksConnectAPI;
         
         const isMainnet = network === 'mainnet';
         const contractAddress = contractIdentifier.split('.')[0];
@@ -334,7 +325,7 @@
         console.error('Erro ao chamar função do contrato:', error);
         alert('Erro ao chamar função: ' + error.message);
       }
-    }
+    };
 
     // Função para recarregar chainhooks periodicamente (opcional)
     // setInterval(loadChainhooks, 30000); // Recarrega a cada 30 segundos
@@ -446,7 +437,7 @@
       }
     }
 
-    async function deleteChainhook(uuid, name) {
+    window.deleteChainhook = async function(uuid, name) {
       // Solicita confirmação antes de deletar
       if (!confirm(`Tem certeza que deseja deletar o chainhook "${name}"?\n\nUUID: ${uuid}\n\nEsta ação não pode ser desfeita.`)) {
         return;
