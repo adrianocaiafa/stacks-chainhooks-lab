@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chainhooks Manager</title>
   <script src="https://unpkg.com/@stacks/transactions@6/dist/index.umd.js"></script>
+  <script src="https://unpkg.com/@stacks/connect@7/dist/connect.umd.js"></script>
   <style>
     * {
       margin: 0;
@@ -228,42 +229,32 @@
     // Estado da carteira
     let userData = null;
     
-    // Carrega Stacks Connect usando ES modules via import dinâmico
+    // Carrega/verifica Stacks Connect (já carregado via script tag)
     async function loadStacksConnect() {
-      try {
-        // Tenta importar via jsDelivr ESM
-        const stacksConnectModule = await import('https://cdn.jsdelivr.net/npm/@stacks/connect@7/dist/index.js');
-        const stacksTransactionsModule = await import('https://cdn.jsdelivr.net/npm/@stacks/transactions@6/dist/index.js');
-        
-        // Verifica se as funções estão disponíveis
-        if (!stacksConnectModule.showConnect || !stacksConnectModule.showContractCall) {
-          throw new Error('Funções do Stacks Connect não encontradas no módulo');
-        }
-
+      // Aguarda um pouco para garantir que os scripts foram carregados
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Verifica se está disponível globalmente
+      if (window.stacksConnect && window.StacksTransactions) {
         return {
-          showConnect: stacksConnectModule.showConnect,
-          showContractCall: stacksConnectModule.showContractCall,
-          StacksMainnet: stacksTransactionsModule.StacksMainnet,
-          StacksTestnet: stacksTransactionsModule.StacksTestnet
+          showConnect: window.stacksConnect.showConnect,
+          showContractCall: window.stacksConnect.showContractCall,
+          StacksMainnet: window.StacksTransactions.StacksMainnet,
+          StacksTestnet: window.StacksTransactions.StacksTestnet
         };
-      } catch (error) {
-        console.error('Erro ao importar Stacks Connect via ESM:', error);
-        // Tenta alternativa com unpkg
-        try {
-          const stacksConnectModule = await import('https://unpkg.com/@stacks/connect@7/dist/index.js');
-          const stacksTransactionsModule = await import('https://unpkg.com/@stacks/transactions@6/dist/index.js');
-          
-          return {
-            showConnect: stacksConnectModule.showConnect,
-            showContractCall: stacksConnectModule.showContractCall,
-            StacksMainnet: stacksTransactionsModule.StacksMainnet,
-            StacksTestnet: stacksTransactionsModule.StacksTestnet
-          };
-        } catch (error2) {
-          console.error('Erro ao importar via unpkg:', error2);
-          throw new Error('Não foi possível carregar Stacks Connect. Verifique sua conexão ou use uma extensão de carteira.');
-        }
       }
+      
+      // Tenta verificar de outra forma (pode estar em outro nome)
+      if (window.StacksConnect) {
+        return {
+          showConnect: window.StacksConnect.showConnect || window.StacksConnect.default?.showConnect,
+          showContractCall: window.StacksConnect.showContractCall || window.StacksConnect.default?.showContractCall,
+          StacksMainnet: window.StacksTransactions?.StacksMainnet,
+          StacksTestnet: window.StacksTransactions?.StacksTestnet
+        };
+      }
+      
+      throw new Error('Stacks Connect não está disponível. Certifique-se de que os scripts foram carregados corretamente.');
     }
 
     // Inicia o carregamento das bibliotecas em background
