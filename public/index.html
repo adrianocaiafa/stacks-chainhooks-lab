@@ -246,25 +246,39 @@
           return;
         }
 
-        listContainer.innerHTML = chainhooks.map(chainhook => `
+        listContainer.innerHTML = chainhooks.map(chainhook => {
+          const definition = chainhook.definition || {};
+          const status = chainhook.status || {};
+          const name = definition.name || 'Sem nome';
+          const isEnabled = status.enabled !== false;
+          const statusText = status.status || 'unknown';
+          const occurrenceCount = status.occurrence_count || 0;
+          const evaluatedBlocks = status.evaluated_block_count || 0;
+          const eventsCount = definition.filters?.events?.length || 0;
+          
+          return `
           <div class="chainhook-item">
             <div class="chainhook-info">
               <h3>
-                ${chainhook.name || 'Sem nome'}
-                ${chainhook.enabled !== false ? '<span class="badge badge-enabled">Ativo</span>' : '<span class="badge badge-disabled">Inativo</span>'}
+                ${name}
+                ${isEnabled ? '<span class="badge badge-enabled">Ativo</span>' : '<span class="badge badge-disabled">Inativo</span>'}
+                <span class="badge" style="background: #e3f2fd; color: #1976d2; margin-left: 8px;">${statusText}</span>
               </h3>
-              <p><strong>Rede:</strong> ${chainhook.network || 'N/A'}</p>
-              <p><strong>Cadeia:</strong> ${chainhook.chain || 'N/A'}</p>
-              ${chainhook.filters?.events ? `<p><strong>Eventos:</strong> ${chainhook.filters.events.length} evento(s) configurado(s)</p>` : ''}
+              <p><strong>Rede:</strong> ${definition.network || 'N/A'}</p>
+              <p><strong>Cadeia:</strong> ${definition.chain || 'N/A'}</p>
+              ${eventsCount > 0 ? `<p><strong>Eventos:</strong> ${eventsCount} evento(s) configurado(s)</p>` : ''}
+              ${occurrenceCount > 0 ? `<p><strong>Ocorrências:</strong> ${occurrenceCount}</p>` : ''}
+              ${evaluatedBlocks > 0 ? `<p><strong>Blocos avaliados:</strong> ${evaluatedBlocks.toLocaleString()}</p>` : ''}
               <div class="chainhook-uuid">UUID: ${chainhook.uuid}</div>
             </div>
             <div>
-              <button class="btn btn-danger" onclick="deleteChainhook('${chainhook.uuid}', '${chainhook.name || 'este chainhook'}')">
+              <button class="btn btn-danger" onclick="deleteChainhook('${chainhook.uuid}', '${name}')">
                 🗑️ Deletar
               </button>
             </div>
           </div>
-        `).join('');
+        `;
+        }).join('');
 
       } catch (error) {
         loadingIndicator.style.display = 'none';
