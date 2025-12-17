@@ -228,43 +228,42 @@
     // Estado da carteira
     let userData = null;
     
-    // Carrega Stacks Connect dinamicamente
+    // Carrega Stacks Connect usando ES modules via import dinâmico
     async function loadStacksConnect() {
-      return new Promise((resolve, reject) => {
-        // Verifica se já está carregado
-        if (window.StacksConnect && window.StacksTransactions) {
-          resolve({
-            showConnect: window.StacksConnect.showConnect,
-            showContractCall: window.StacksConnect.showContractCall,
-            StacksMainnet: window.StacksTransactions.StacksMainnet,
-            StacksTestnet: window.StacksTransactions.StacksTestnet
-          });
-          return;
+      try {
+        // Tenta importar via jsDelivr ESM
+        const stacksConnectModule = await import('https://cdn.jsdelivr.net/npm/@stacks/connect@7/dist/index.js');
+        const stacksTransactionsModule = await import('https://cdn.jsdelivr.net/npm/@stacks/transactions@6/dist/index.js');
+        
+        // Verifica se as funções estão disponíveis
+        if (!stacksConnectModule.showConnect || !stacksConnectModule.showContractCall) {
+          throw new Error('Funções do Stacks Connect não encontradas no módulo');
         }
 
-        // Carrega o script do Stacks Connect
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/@stacks/connect@7/dist/index.umd.js';
-        script.onload = () => {
-          // Aguarda um pouco para garantir que está disponível
-          setTimeout(() => {
-            if (window.StacksConnect && window.StacksTransactions) {
-              resolve({
-                showConnect: window.StacksConnect.showConnect,
-                showContractCall: window.StacksConnect.showContractCall,
-                StacksMainnet: window.StacksTransactions.StacksMainnet,
-                StacksTestnet: window.StacksTransactions.StacksTestnet
-              });
-            } else {
-              reject(new Error('Bibliotecas Stacks não foram carregadas corretamente'));
-            }
-          }, 100);
+        return {
+          showConnect: stacksConnectModule.showConnect,
+          showContractCall: stacksConnectModule.showContractCall,
+          StacksMainnet: stacksTransactionsModule.StacksMainnet,
+          StacksTestnet: stacksTransactionsModule.StacksTestnet
         };
-        script.onerror = () => {
-          reject(new Error('Falha ao carregar script do Stacks Connect'));
-        };
-        document.head.appendChild(script);
-      });
+      } catch (error) {
+        console.error('Erro ao importar Stacks Connect via ESM:', error);
+        // Tenta alternativa com unpkg
+        try {
+          const stacksConnectModule = await import('https://unpkg.com/@stacks/connect@7/dist/index.js');
+          const stacksTransactionsModule = await import('https://unpkg.com/@stacks/transactions@6/dist/index.js');
+          
+          return {
+            showConnect: stacksConnectModule.showConnect,
+            showContractCall: stacksConnectModule.showContractCall,
+            StacksMainnet: stacksTransactionsModule.StacksMainnet,
+            StacksTestnet: stacksTransactionsModule.StacksTestnet
+          };
+        } catch (error2) {
+          console.error('Erro ao importar via unpkg:', error2);
+          throw new Error('Não foi possível carregar Stacks Connect. Verifique sua conexão ou use uma extensão de carteira.');
+        }
+      }
     }
 
     // Inicia o carregamento das bibliotecas em background
