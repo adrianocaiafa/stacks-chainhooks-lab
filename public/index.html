@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chainhooks Manager</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: #666;
+    }
+
+    .actions {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+
+    .btn-danger {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c0392b;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .chainhooks-list {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .chainhook-item {
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s;
+    }
+
+    .chainhook-item:hover {
+      background: #f8f9fa;
+    }
+
+    .chainhook-item:last-child {
+      border-bottom: none;
+    }
+
+    .chainhook-info {
+      flex: 1;
+    }
+
+    .chainhook-info h3 {
+      color: #333;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .chainhook-info p {
+      color: #666;
+      font-size: 14px;
+      margin: 4px 0;
+    }
+
+    .chainhook-uuid {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: #999;
+      background: #f0f0f0;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-top: 8px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-state h2 {
+      margin-bottom: 10px;
+      color: #666;
+    }
+
+    .error {
+      background: #fee;
+      color: #c33;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      border-left: 4px solid #c33;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+
+    .badge-enabled {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .badge-disabled {
+      background: #f8d7da;
+      color: #721c24;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔗 Chainhooks Manager</h1>
+      <p>Gerencie seus chainhooks da Stacks Blockchain</p>
+    </div>
+
+    <div id="error-container"></div>
+
+    <div class="actions">
+      <div>
+        <button class="btn btn-primary" onclick="loadChainhooks()">🔄 Atualizar Lista</button>
+      </div>
+      <div id="loading-indicator" style="display: none; color: #666;">
+        Carregando...
+      </div>
+    </div>
+
+    <div class="chainhooks-list" id="chainhooks-list">
+      <div class="loading">Carregando chainhooks...</div>
+    </div>
+  </div>
+
+  <script>
+    // Carregar chainhooks ao carregar a página
+    window.addEventListener('DOMContentLoaded', () => {
+      loadChainhooks();
+    });
+
+    async function loadChainhooks() {
+      const listContainer = document.getElementById('chainhooks-list');
+      const loadingIndicator = document.getElementById('loading-indicator');
+      const errorContainer = document.getElementById('error-container');
+      
+      errorContainer.innerHTML = '';
+      loadingIndicator.style.display = 'block';
+      listContainer.innerHTML = '<div class="loading">Carregando chainhooks...</div>';
+
+      try {
+        const response = await fetch('/api/chainhooks');
+        const result = await response.json();
+
+        loadingIndicator.style.display = 'none';
+
+        if (!result.success) {
+          throw new Error(result.error || 'Erro ao carregar chainhooks');
+        }
+
+        const chainhooks = result.data || [];
+
+        if (chainhooks.length === 0) {
+          listContainer.innerHTML = `
+            <div class="empty-state">
+              <h2>Nenhum chainhook encontrado</h2>
+              <p>Você ainda não criou nenhum chainhook.</p>
+            </div>
+          `;
+          return;
+        }
+
+        listContainer.innerHTML = chainhooks.map(chainhook => `
+          <div class="chainhook-item">
+            <div class="chainhook-info">
+              <h3>
+                ${chainhook.name || 'Sem nome'}
+                ${chainhook.enabled !== false ? '<span class="badge badge-enabled">Ativo</span>' : '<span class="badge badge-disabled">Inativo</span>'}
+              </h3>
+              <p><strong>Rede:</strong> ${chainhook.network || 'N/A'}</p>
+              <p><strong>Cadeia:</strong> ${chainhook.chain || 'N/A'}</p>
+              ${chainhook.filters?.events ? `<p><strong>Eventos:</strong> ${chainhook.filters.events.length} evento(s) configurado(s)</p>` : ''}
+              <div class="chainhook-uuid">UUID: ${chainhook.uuid}</div>
+            </div>
+            <div>
+              <button class="btn btn-danger" onclick="deleteChainhook('${chainhook.uuid}', '${chainhook.name || 'este chainhook'}')">
+                🗑️ Deletar
+              </button>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (error) {
+        loadingIndicator.style.display = 'none';
+        errorContainer.innerHTML = `
+          <div class="error">
+            <strong>Erro:</strong> ${error.message}
+          </div>
+        `;
+        listContainer.innerHTML = '<div class="empty-state"><h2>Erro ao carregar chainhooks</h2></div>';
+      }
+    }
+
+    async function deleteChainhook(uuid, name) {
+      if (!confirm(`Tem certeza que deseja deletar o chainhook "${name}"?\n\nUUID: ${uuid}\n\nEsta ação não pode ser desfeita.`)) {
+        return;
+      }
+
+      const errorContainer = document.getElementById('error-container');
+      errorContainer.innerHTML = '';
+
+      try {
+        const response = await fetch(`/api/chainhooks/${uuid}`, {
+          method: 'DELETE'
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.error || 'Erro ao deletar chainhook');
+        }
+
+        // Recarregar a lista
+        loadChainhooks();
+
+      } catch (error) {
+        errorContainer.innerHTML = `
+          <div class="error">
+            <strong>Erro ao deletar:</strong> ${error.message}
+          </div>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
+
