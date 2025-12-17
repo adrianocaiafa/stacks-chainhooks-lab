@@ -42,6 +42,7 @@ try {
   },
   action: {
     type: 'http_post',
+    // URL do webhook que receberá as notificações do chainhook
     url: 'https://example.com/webhooks',
   },
   options: {
