@@ -32,7 +32,9 @@ try {
     events: [
       {
         type: 'contract_call',
+        // Substitua pelo identificador do contrato real que deseja monitorar
         contract_identifier: 'SP...XYZ.counter',
+        // Substitua pelo nome da função que deseja monitorar
         function_name: 'increment',
       },
     ],
