@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chainhooks Manager</title>
+  <script src="https://unpkg.com/@stacks/transactions@6/dist/index.umd.js"></script>
   <style>
     * {
       margin: 0;
@@ -226,46 +227,56 @@
   <script>
     // Estado da carteira
     let userData = null;
-    let StacksConnectAPI = null;
-    let stacksConnectLoading = false;
-    let stacksConnectLoaded = false;
-
-    // Importa as bibliotecas Stacks de forma assíncrona
+    
+    // Carrega Stacks Connect dinamicamente
     async function loadStacksConnect() {
-      if (stacksConnectLoaded) {
-        return StacksConnectAPI;
-      }
-      
-      if (stacksConnectLoading) {
-        // Aguarda o carregamento em andamento
-        while (stacksConnectLoading && !stacksConnectLoaded) {
-          await new Promise(resolve => setTimeout(resolve, 100));
+      return new Promise((resolve, reject) => {
+        // Verifica se já está carregado
+        if (window.StacksConnect && window.StacksTransactions) {
+          resolve({
+            showConnect: window.StacksConnect.showConnect,
+            showContractCall: window.StacksConnect.showContractCall,
+            StacksMainnet: window.StacksTransactions.StacksMainnet,
+            StacksTestnet: window.StacksTransactions.StacksTestnet
+          });
+          return;
         }
-        return StacksConnectAPI;
-      }
 
-      stacksConnectLoading = true;
-      try {
-        console.log('Carregando bibliotecas Stacks...');
-        const { showConnect, showContractCall } = await import('https://cdn.jsdelivr.net/npm/@stacks/connect@7/+esm');
-        const { StacksMainnet, StacksTestnet } = await import('https://cdn.jsdelivr.net/npm/@stacks/transactions@6/+esm');
-        StacksConnectAPI = { showConnect, showContractCall, StacksMainnet, StacksTestnet };
-        window.StacksConnectAPI = StacksConnectAPI;
-        stacksConnectLoaded = true;
-        stacksConnectLoading = false;
-        console.log('Stacks Connect carregado com sucesso');
-        return StacksConnectAPI;
-      } catch (error) {
-        console.error('Erro ao carregar bibliotecas Stacks:', error);
-        stacksConnectLoading = false;
-        throw error;
-      }
+        // Carrega o script do Stacks Connect
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/@stacks/connect@7/dist/index.umd.js';
+        script.onload = () => {
+          // Aguarda um pouco para garantir que está disponível
+          setTimeout(() => {
+            if (window.StacksConnect && window.StacksTransactions) {
+              resolve({
+                showConnect: window.StacksConnect.showConnect,
+                showContractCall: window.StacksConnect.showContractCall,
+                StacksMainnet: window.StacksTransactions.StacksMainnet,
+                StacksTestnet: window.StacksTransactions.StacksTestnet
+              });
+            } else {
+              reject(new Error('Bibliotecas Stacks não foram carregadas corretamente'));
+            }
+          }, 100);
+        };
+        script.onerror = () => {
+          reject(new Error('Falha ao carregar script do Stacks Connect'));
+        };
+        document.head.appendChild(script);
+      });
     }
 
     // Inicia o carregamento das bibliotecas em background
-    loadStacksConnect().catch(error => {
-      console.error('Falha ao carregar Stacks Connect:', error);
-    });
+    let StacksConnectAPI = null;
+    loadStacksConnect()
+      .then(api => {
+        StacksConnectAPI = api;
+        console.log('Stacks Connect carregado com sucesso');
+      })
+      .catch(error => {
+        console.error('Falha ao carregar Stacks Connect:', error);
+      });
 
     // Aguarda o DOM estar pronto
     document.addEventListener('DOMContentLoaded', () => {
@@ -276,14 +287,35 @@
     async function connectWallet() {
       try {
         // Garante que as bibliotecas estejam carregadas
-        const api = await loadStacksConnect();
+        if (!StacksConnectAPI) {
+          const loadingMsg = document.createElement('div');
+          loadingMsg.textContent = 'Carregando Stacks Connect...';
+          loadingMsg.style.position = 'fixed';
+          loadingMsg.style.top = '50%';
+          loadingMsg.style.left = '50%';
+          loadingMsg.style.transform = 'translate(-50%, -50%)';
+          loadingMsg.style.background = 'white';
+          loadingMsg.style.padding = '20px';
+          loadingMsg.style.borderRadius = '8px';
+          loadingMsg.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+          loadingMsg.style.zIndex = '9999';
+          document.body.appendChild(loadingMsg);
+          
+          try {
+            StacksConnectAPI = await loadStacksConnect();
+            document.body.removeChild(loadingMsg);
+          } catch (error) {
+            document.body.removeChild(loadingMsg);
+            throw error;
+          }
+        }
         
-        if (!api || !api.showConnect) {
+        if (!StacksConnectAPI || !StacksConnectAPI.showConnect) {
           alert('Erro ao carregar biblioteca Stacks Connect. Verifique o console para mais detalhes.');
           return;
         }
 
-        const { showConnect } = api;
+        const { showConnect } = StacksConnectAPI;
         
         await showConnect({
           appDetails: {
@@ -342,14 +374,16 @@
 
       try {
         // Garante que as bibliotecas estejam carregadas
-        const api = await loadStacksConnect();
+        if (!StacksConnectAPI) {
+          StacksConnectAPI = await loadStacksConnect();
+        }
         
-        if (!api || !api.showContractCall) {
+        if (!StacksConnectAPI || !StacksConnectAPI.showContractCall) {
           alert('Erro ao carregar biblioteca Stacks Connect. Verifique o console para mais detalhes.');
           return;
         }
 
-        const { showContractCall, StacksMainnet, StacksTestnet } = api;
+        const { showContractCall, StacksMainnet, StacksTestnet } = StacksConnectAPI;
         
         const isMainnet = network === 'mainnet';
         const contractAddress = contractIdentifier.split('.')[0];
