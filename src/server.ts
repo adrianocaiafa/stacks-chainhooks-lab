@@ -24,6 +24,7 @@ const client = new ChainhooksClient({
 });
 
 const app = express();
+// Porta padrão: 3000, pode ser configurada via variável de ambiente PORT
 const PORT = process.env.PORT || 3000;
 
 // Middlewares
