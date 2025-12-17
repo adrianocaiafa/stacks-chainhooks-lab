@@ -37,7 +37,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-// API: Listar todos os chainhooks
+// API: Listar todos os chainhooks com suporte a paginação
 app.get('/api/chainhooks', async (req, res) => {
   try {
     const { offset = 0, limit = 100 } = req.query;
