@@ -4,9 +4,14 @@ import dotenv from 'dotenv';
 // Carrega variáveis de ambiente do arquivo .env
 dotenv.config();
 
+// Valida se a API key foi fornecida
+if (!process.env.HIRO_API_KEY) {
+  throw new Error('HIRO_API_KEY não encontrada no arquivo .env');
+}
+
 const client = new ChainhooksClient({
   baseUrl: CHAINHOOKS_BASE_URL.testnet, // or CHAINHOOKS_BASE_URL.mainnet
-  apiKey: process.env.HIRO_API_KEY!,
+  apiKey: process.env.HIRO_API_KEY,
 });
 
 // Register and enable a chainhook
