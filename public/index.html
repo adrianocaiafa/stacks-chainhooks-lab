@@ -227,19 +227,45 @@
     // Estado da carteira
     let userData = null;
     let StacksConnectAPI = null;
+    let stacksConnectLoading = false;
+    let stacksConnectLoaded = false;
 
     // Importa as bibliotecas Stacks de forma assíncrona
-    (async () => {
+    async function loadStacksConnect() {
+      if (stacksConnectLoaded) {
+        return StacksConnectAPI;
+      }
+      
+      if (stacksConnectLoading) {
+        // Aguarda o carregamento em andamento
+        while (stacksConnectLoading && !stacksConnectLoaded) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        return StacksConnectAPI;
+      }
+
+      stacksConnectLoading = true;
       try {
+        console.log('Carregando bibliotecas Stacks...');
         const { showConnect, showContractCall } = await import('https://cdn.jsdelivr.net/npm/@stacks/connect@7/+esm');
         const { StacksMainnet, StacksTestnet } = await import('https://cdn.jsdelivr.net/npm/@stacks/transactions@6/+esm');
         StacksConnectAPI = { showConnect, showContractCall, StacksMainnet, StacksTestnet };
         window.StacksConnectAPI = StacksConnectAPI;
+        stacksConnectLoaded = true;
+        stacksConnectLoading = false;
         console.log('Stacks Connect carregado com sucesso');
+        return StacksConnectAPI;
       } catch (error) {
         console.error('Erro ao carregar bibliotecas Stacks:', error);
+        stacksConnectLoading = false;
+        throw error;
       }
-    })();
+    }
+
+    // Inicia o carregamento das bibliotecas em background
+    loadStacksConnect().catch(error => {
+      console.error('Falha ao carregar Stacks Connect:', error);
+    });
 
     // Aguarda o DOM estar pronto
     document.addEventListener('DOMContentLoaded', () => {
@@ -249,12 +275,15 @@
     // Conecta a carteira Stacks
     async function connectWallet() {
       try {
-        if (!StacksConnectAPI || !StacksConnectAPI.showConnect) {
-          alert('Biblioteca Stacks Connect ainda não carregou. Aguarde alguns segundos e tente novamente.');
+        // Garante que as bibliotecas estejam carregadas
+        const api = await loadStacksConnect();
+        
+        if (!api || !api.showConnect) {
+          alert('Erro ao carregar biblioteca Stacks Connect. Verifique o console para mais detalhes.');
           return;
         }
 
-        const { showConnect } = StacksConnectAPI;
+        const { showConnect } = api;
         
         await showConnect({
           appDetails: {
@@ -312,12 +341,15 @@
       }
 
       try {
-        if (!StacksConnectAPI || !StacksConnectAPI.showContractCall) {
-          alert('Biblioteca Stacks Connect ainda não carregou. Aguarde alguns segundos e tente novamente.');
+        // Garante que as bibliotecas estejam carregadas
+        const api = await loadStacksConnect();
+        
+        if (!api || !api.showContractCall) {
+          alert('Erro ao carregar biblioteca Stacks Connect. Verifique o console para mais detalhes.');
           return;
         }
 
-        const { showContractCall, StacksMainnet, StacksTestnet } = StacksConnectAPI;
+        const { showContractCall, StacksMainnet, StacksTestnet } = api;
         
         const isMainnet = network === 'mainnet';
         const contractAddress = contractIdentifier.split('.')[0];
