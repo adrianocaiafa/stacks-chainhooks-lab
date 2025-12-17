@@ -2,12 +2,14 @@
   "name": "stacks-chainhooks-lab",
   "version": "1.0.0",
   "description": "Stacks Chainhooks Lab Project",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "test:quick": "ts-node-dev --transpile-only src/quick-test.ts",
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
+    "server": "tsx src/server.ts",
+    "test:quick": "tsx src/quick-test.ts",
     "clean": "rm -rf dist"
   },
   "keywords": [
@@ -19,11 +21,17 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.10.0",
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
     "ts-node-dev": "^2.0.0",
+    "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   },
   "dependencies": {
     "@hirosystems/chainhooks-client": "^1.0.0",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "undici": "^7.16.0"
   }
 }
