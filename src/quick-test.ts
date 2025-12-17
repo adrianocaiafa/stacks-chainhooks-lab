@@ -16,8 +16,9 @@ if (!process.env.HIRO_API_KEY) {
   throw new Error('HIRO_API_KEY não encontrada no arquivo .env');
 }
 
+// Configura o cliente Chainhooks para testnet
 const client = new ChainhooksClient({
-  baseUrl: CHAINHOOKS_BASE_URL.testnet, // or CHAINHOOKS_BASE_URL.mainnet
+  baseUrl: CHAINHOOKS_BASE_URL.testnet, // ou CHAINHOOKS_BASE_URL.mainnet para mainnet
   apiKey: process.env.HIRO_API_KEY,
 });
 
