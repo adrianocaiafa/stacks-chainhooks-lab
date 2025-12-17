@@ -458,7 +458,7 @@
       }
     }
 
-    window.deleteChainhook = async function(uuid, name) {
+    async function deleteChainhook(uuid, name) {
       // Solicita confirmação antes de deletar
       if (!confirm(`Tem certeza que deseja deletar o chainhook "${name}"?\n\nUUID: ${uuid}\n\nEsta ação não pode ser desfeita.`)) {
         return;
