@@ -1,3 +1,10 @@
+/**
+ * Quick Test - Validação do Chainhooks Client
+ * 
+ * Este arquivo testa a criação de um chainhook usando o @hirosystems/chainhooks-client
+ * Certifique-se de ter configurado a HIRO_API_KEY no arquivo .env
+ */
+
 import { ChainhooksClient, CHAINHOOKS_BASE_URL } from '@hirosystems/chainhooks-client';
 import dotenv from 'dotenv';
 
