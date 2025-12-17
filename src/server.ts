@@ -29,6 +29,7 @@ const PORT = process.env.PORT || 3000;
 // Middlewares
 app.use(cors());
 app.use(express.json());
+// Servir arquivos estáticos da pasta public
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Rota para servir a página HTML
