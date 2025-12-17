@@ -12,7 +12,7 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Valida API key
+// Valida se a API key foi fornecida
 if (!process.env.HIRO_API_KEY) {
   throw new Error('HIRO_API_KEY não encontrada no arquivo .env');
 }
