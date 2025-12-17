@@ -46,7 +46,9 @@ try {
     url: 'https://example.com/webhooks',
   },
   options: {
+    // Decodifica valores Clarity para facilitar o processamento
     decode_clarity_values: true,
+    // Habilita o chainhook imediatamente após o registro
     enable_on_registration: true,
   },
 });
