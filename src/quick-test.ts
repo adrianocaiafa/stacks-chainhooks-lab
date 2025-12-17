@@ -6,7 +6,7 @@
  */
 
 import { ChainhooksClient, CHAINHOOKS_BASE_URL } from '@hirosystems/chainhooks-client';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 
 // Carrega variáveis de ambiente do arquivo .env
 dotenv.config();
