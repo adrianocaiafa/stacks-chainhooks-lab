@@ -18,32 +18,31 @@ if (!process.env.HIRO_API_KEY) {
 
 // Configura o cliente Chainhooks para testnet
 const client = new ChainhooksClient({
-  baseUrl: CHAINHOOKS_BASE_URL.testnet, // ou CHAINHOOKS_BASE_URL.mainnet para mainnet
+  baseUrl: CHAINHOOKS_BASE_URL.mainnet, // ou CHAINHOOKS_BASE_URL.mainnet para mainnet
   apiKey: process.env.HIRO_API_KEY,
 });
-
 // Register and enable a chainhook
 try {
   const chainhook = await client.registerChainhook({
   version: '1',
   name: 'my-first-chainhook',
   chain: 'stacks',
-  network: 'testnet',
+  network: 'mainnet',
   filters: {
     events: [
       {
         type: 'contract_call',
         // Substitua pelo identificador do contrato real que deseja monitorar
-        contract_identifier: 'SP...XYZ.counter',
+        contract_identifier: 'SP1RSWVNQ7TW839J8V22E9JBHTW6ZQXSNR67HTZE9.simple-gm',
         // Substitua pelo nome da função que deseja monitorar
-        function_name: 'increment',
+        function_name: 'gm',
       },
     ],
   },
   action: {
     type: 'http_post',
     // URL do webhook que receberá as notificações do chainhook
-    url: 'https://example.com/webhooks',
+    url: 'https://webhook-test.com/52771ab55148dc5fa1e399c8e41d4c11',
   },
   options: {
     // Decodifica valores Clarity para facilitar o processamento
