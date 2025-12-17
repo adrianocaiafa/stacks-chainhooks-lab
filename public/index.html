@@ -4,15 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chainhooks Manager</title>
-  <script type="module">
-    // Importação das bibliotecas Stacks via ES modules
-    import { showConnect, showContractCall } from 'https://cdn.jsdelivr.net/npm/@stacks/connect@7/dist/index.esm.js';
-    import { StacksMainnet, StacksTestnet, stringUtf8CV } from 'https://cdn.jsdelivr.net/npm/@stacks/transactions@6/dist/index.esm.js';
-    
-    // Torna as funções disponíveis globalmente
-    window.StacksConnect = { showConnect, showContractCall };
-    window.StacksTransactions = { StacksMainnet, StacksTestnet, stringUtf8CV };
-  </script>
+  <script src="https://unpkg.com/@stacks/connect@7/dist/index.umd.js"></script>
+  <script src="https://unpkg.com/@stacks/transactions@6/dist/index.umd.js"></script>
   <style>
     * {
       margin: 0;
@@ -246,14 +239,14 @@
     // Conecta a carteira Stacks
     async function connectWallet() {
       try {
-        if (!window.StacksConnect) {
-          alert('Aguardando bibliotecas carregarem... Tente novamente em alguns segundos.');
+        if (typeof window.StacksConnect === 'undefined') {
+          alert('Biblioteca Stacks Connect não carregou. Aguarde alguns segundos e tente novamente.');
           return;
         }
 
-        const isMainnet = true; // Pode ser ajustado conforme necessário
+        const { showConnect } = window.StacksConnect;
         
-        await window.StacksConnect.showConnect({
+        await showConnect({
           appDetails: {
             name: 'Chainhooks Manager',
             icon: window.location.origin + '/favicon.ico'
@@ -306,11 +299,14 @@
       }
 
       try {
-        if (!window.StacksConnect || !window.StacksTransactions) {
+        if (typeof window.StacksConnect === 'undefined' || typeof window.StacksTransactions === 'undefined') {
           alert('Bibliotecas Stacks não estão disponíveis. Aguarde alguns segundos e tente novamente.');
           return;
         }
 
+        const { showContractCall } = window.StacksConnect;
+        const { StacksMainnet, StacksTestnet } = window.StacksTransactions;
+        
         const isMainnet = network === 'mainnet';
         const contractAddress = contractIdentifier.split('.')[0];
         const contractName = contractIdentifier.split('.')[1];
@@ -319,12 +315,12 @@
         // Se a função precisar de parâmetros, eles devem ser adicionados aqui
         const functionArgs = [];
         
-        await window.StacksConnect.showContractCall({
+        await showContractCall({
           contractAddress: contractAddress,
           contractName: contractName,
           functionName: functionName,
           functionArgs: functionArgs,
-          network: isMainnet ? window.StacksTransactions.StacksMainnet : window.StacksTransactions.StacksTestnet,
+          network: isMainnet ? StacksMainnet : StacksTestnet,
           onFinish: (data) => {
             console.log('Transação enviada:', data);
             alert(`Transação enviada com sucesso!\nTX ID: ${data.txId || data}\n\nO chainhook será ativado quando a transação for confirmada.`);
