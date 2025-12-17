@@ -34,19 +34,23 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Rota para servir a página HTML
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 // API: Listar todos os chainhooks com suporte a paginação
 app.get('/api/chainhooks', async (req, res) => {
   try {
-    const { offset = 0, limit = 100 } = req.query;
+    const { offset = 0, limit = 60 } = req.query;
+    // Limita o máximo de itens por página a 60 (limite da API)
+    const limitValue = Math.min(Number(limit), 60);
+    const offsetValue = Math.max(Number(offset), 0);
+    
     const response = await client.getChainhooks({
-      offset: Number(offset),
-      limit: Number(limit),
+      offset: offsetValue,
+      limit: limitValue,
     });
-    res.json({ success: true, data: response.chainhooks || [] });
+    res.json({ success: true, data: response.results || [] });
   } catch (error: any) {
     console.error('Erro ao listar chainhooks:', error);
     res.status(500).json({ 
