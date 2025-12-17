@@ -15,7 +15,8 @@ const client = new ChainhooksClient({
 });
 
 // Register and enable a chainhook
-const chainhook = await client.registerChainhook({
+try {
+  const chainhook = await client.registerChainhook({
   version: '1',
   name: 'my-first-chainhook',
   chain: 'stacks',
@@ -39,5 +40,9 @@ const chainhook = await client.registerChainhook({
   },
 });
 
-console.log('Chainhooks created:', chainhook.uuid);
+  console.log('Chainhooks created:', chainhook.uuid);
+} catch (error) {
+  console.error('Erro ao criar chainhook:', error);
+  process.exit(1);
+}
 
