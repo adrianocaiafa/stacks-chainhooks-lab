@@ -207,10 +207,13 @@
   </div>
 
   <script>
-    // Carregar chainhooks ao carregar a página
+    // Carregar chainhooks automaticamente ao carregar a página
     window.addEventListener('DOMContentLoaded', () => {
       loadChainhooks();
     });
+
+    // Função para recarregar chainhooks periodicamente (opcional)
+    // setInterval(loadChainhooks, 30000); // Recarrega a cada 30 segundos
 
     async function loadChainhooks() {
       const listContainer = document.getElementById('chainhooks-list');
