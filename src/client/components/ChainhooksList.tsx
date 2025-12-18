@@ -87,7 +87,7 @@ const ChainhooksList = forwardRef<ChainhooksListHandle>((_props, ref) => {
         contractName,
         functionName,
         functionArgs: [],
-        network: isMainnet ? StacksMainnet : StacksTestnet,
+        network: isMainnet ? new StacksMainnet() : new StacksTestnet(),
         onFinish: (data) => {
           console.log('Transação enviada:', data);
           alert(
