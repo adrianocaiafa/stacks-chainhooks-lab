@@ -30,12 +30,21 @@ const PORT = process.env.PORT || 3000;
 // Middlewares
 app.use(cors());
 app.use(express.json());
-// Servir arquivos estáticos da pasta public
-app.use(express.static(path.join(__dirname, '../public')));
-// Servir node_modules para bibliotecas Stacks
-app.use('/node_modules', express.static(path.join(__dirname, '../node_modules')));
-// Servir bibliotecas Stacks do node_modules
-app.use('/node_modules', express.static(path.join(__dirname, '../node_modules')));
+
+// Servir API
+app.use('/api', express.json());
+
+// Servir arquivos estáticos do build do React (em produção)
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../dist/client')));
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(__dirname, '../dist/client/index.html'));
+  });
+} else {
+  // Em desenvolvimento, o Vite serve os arquivos React
+  // Servir arquivos estáticos da pasta public (para assets antigos se necessário)
+  app.use(express.static(path.join(__dirname, '../public')));
+}
 
 // Rota para servir a página HTML
 app.get('/', (_req, res) => {
