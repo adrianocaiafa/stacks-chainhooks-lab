@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { showConnect } from '@stacks/connect';
+import { showConnect, getUserSession } from '@stacks/connect';
 import './WalletConnection.css';
 
 interface UserData {
@@ -9,6 +9,23 @@ interface UserData {
 
 function WalletConnection() {
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Verifica se já existe uma sessão ativa
+    try {
+      const session = getUserSession();
+      if (session && session.isUserSignedIn()) {
+        const userData = session.loadUserData();
+        const address = userData.profile?.stxAddress?.mainnet || userData.profile?.stxAddress?.testnet;
+        setUserData({ profile: userData.profile, address });
+      }
+    } catch (error) {
+      console.log('Nenhuma sessão ativa');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const connectWallet = async () => {
     try {
@@ -20,7 +37,6 @@ function WalletConnection() {
         onFinish: (data) => {
           const address = data.profile?.stxAddress?.mainnet || data.profile?.stxAddress?.testnet;
           setUserData({ ...data, address });
-          window.location.reload();
         },
       });
     } catch (error) {
@@ -29,10 +45,22 @@ function WalletConnection() {
     }
   };
 
-  const disconnectWallet = () => {
-    setUserData(null);
-    window.location.reload();
+  const disconnectWallet = async () => {
+    try {
+      const session = getUserSession();
+      if (session) {
+        session.signUserOut();
+      }
+      setUserData(null);
+    } catch (error) {
+      console.error('Erro ao desconectar:', error);
+      setUserData(null);
+    }
   };
+
+  if (loading) {
+    return <div className="wallet-section">Carregando...</div>;
+  }
 
   return (
     <div className="wallet-section">
