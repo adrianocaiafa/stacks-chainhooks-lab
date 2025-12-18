@@ -100,6 +100,7 @@ const ChainhooksList = forwardRef<ChainhooksListHandle>((_props, ref) => {
       const contractAddress = contractIdentifier.split('.')[0];
       const contractName = contractIdentifier.split('.')[1];
 
+      console.log('Verificando sessão:', userSession.isUserSignedIn());
       if (!userSession.isUserSignedIn()) {
         alert('Por favor, conecte sua carteira primeiro!');
         return;
