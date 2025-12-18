@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
-import { showContractCall } from '@stacks/connect';
+import { showContractCall, UserSession, AppConfig } from '@stacks/connect';
 import { StacksMainnet, StacksTestnet } from '@stacks/network-v6';
 import ChainhookItem from './ChainhookItem';
 import './ChainhooksList.css';
+
+const appConfig = new AppConfig(['store_write', 'publish_data']);
+const userSession = new UserSession({ appConfig });
 
 export interface Chainhook {
   uuid: string;
@@ -88,12 +91,21 @@ const ChainhooksList = forwardRef<ChainhooksListHandle>((_props, ref) => {
       const contractAddress = contractIdentifier.split('.')[0];
       const contractName = contractIdentifier.split('.')[1];
 
+      if (!userSession.isUserSignedIn()) {
+        alert('Por favor, conecte sua carteira primeiro!');
+        return;
+      }
+
       await showContractCall({
         contractAddress,
         contractName,
         functionName,
         functionArgs: [],
         network: isMainnet ? new StacksMainnet() : new StacksTestnet(),
+        appDetails: {
+          name: 'Chainhooks Lab',
+          icon: window.location.origin + '/favicon.ico',
+        },
         onFinish: (data) => {
           console.log('Transação enviada:', data);
           alert(
@@ -104,6 +116,7 @@ const ChainhooksList = forwardRef<ChainhooksListHandle>((_props, ref) => {
         onCancel: () => {
           console.log('Transação cancelada pelo usuário');
         },
+        userSession,
       });
     } catch (error) {
       console.error('Erro ao chamar função do contrato:', error);
