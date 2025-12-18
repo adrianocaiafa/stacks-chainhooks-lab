@@ -38,14 +38,6 @@ const ChainhooksList = forwardRef<ChainhooksListHandle>((_props, ref) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useImperativeHandle(ref, () => ({
-    reload: loadChainhooks,
-  }));
-
-  useEffect(() => {
-    loadChainhooks();
-  }, []);
-
   const loadChainhooks = async () => {
     setLoading(true);
     setError(null);
@@ -70,6 +62,14 @@ const ChainhooksList = forwardRef<ChainhooksListHandle>((_props, ref) => {
       setLoading(false);
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    reload: loadChainhooks,
+  }));
+
+  useEffect(() => {
+    loadChainhooks();
+  }, []);
 
   const handleDelete = async (uuid: string) => {
     try {
