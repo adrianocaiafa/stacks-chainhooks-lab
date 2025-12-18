@@ -32,6 +32,10 @@ app.use(cors());
 app.use(express.json());
 // Servir arquivos estáticos da pasta public
 app.use(express.static(path.join(__dirname, '../public')));
+// Servir node_modules para bibliotecas Stacks
+app.use('/node_modules', express.static(path.join(__dirname, '../node_modules')));
+// Servir bibliotecas Stacks do node_modules
+app.use('/node_modules', express.static(path.join(__dirname, '../node_modules')));
 
 // Rota para servir a página HTML
 app.get('/', (_req, res) => {

@@ -227,12 +227,12 @@
     // Estado da carteira
     let userData = null;
     
-    // Carrega/verifica Stacks Connect usando import dinâmico
+    // Carrega/verifica Stacks Connect usando arquivos locais do node_modules
     async function loadStacksConnect() {
       try {
-        // Tenta importar via ESM (funciona melhor no browser moderno)
-        const stacksConnectModule = await import('https://cdn.skypack.dev/@stacks/connect@7');
-        const stacksTransactionsModule = await import('https://cdn.skypack.dev/@stacks/transactions@6');
+        // Importa dos arquivos servidos localmente pelo Express
+        const stacksConnectModule = await import('/node_modules/@stacks/connect/dist/index.js');
+        const stacksTransactionsModule = await import('/node_modules/@stacks/transactions/dist/index.js');
         
         return {
           showConnect: stacksConnectModule.showConnect,
@@ -241,11 +241,11 @@
           StacksTestnet: stacksTransactionsModule.StacksTestnet
         };
       } catch (error) {
-        console.error('Erro ao importar via Skypack:', error);
-        // Tenta alternativa com jsDelivr
+        console.error('Erro ao importar localmente:', error);
+        // Fallback: tenta usar um bundler simples via unpkg bundle
         try {
-          const stacksConnectModule = await import('https://cdn.jsdelivr.net/npm/@stacks/connect@7/+esm');
-          const stacksTransactionsModule = await import('https://cdn.jsdelivr.net/npm/@stacks/transactions@6/+esm');
+          const stacksConnectModule = await import('https://unpkg.com/@stacks/connect@7?module');
+          const stacksTransactionsModule = await import('https://unpkg.com/@stacks/transactions@6?module');
           
           return {
             showConnect: stacksConnectModule.showConnect,
@@ -254,9 +254,8 @@
             StacksTestnet: stacksTransactionsModule.StacksTestnet
           };
         } catch (error2) {
-          console.error('Erro ao importar via jsDelivr:', error2);
-          console.log('Window objects disponíveis:', Object.keys(window).filter(k => k.toLowerCase().includes('stack')));
-          throw new Error('Não foi possível carregar Stacks Connect. Erros: ' + error.message + ' | ' + error2.message);
+          console.error('Erro ao importar via unpkg:', error2);
+          throw new Error('Não foi possível carregar Stacks Connect. Tente recarregar a página. Erro: ' + error.message);
         }
       }
     }
