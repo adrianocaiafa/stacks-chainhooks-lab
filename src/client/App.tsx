@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import ChainhooksList from './components/ChainhooksList';
 import WalletConnection from './components/WalletConnection';
 import './App.css';
 
 function App() {
+  const chainhooksListRef = useRef<{ reload: () => void }>(null);
+
+  const handleRefresh = () => {
+    if (chainhooksListRef.current) {
+      chainhooksListRef.current.reload();
+    }
+  };
+
   return (
     <div className="app">
       <div className="header">
@@ -18,12 +26,12 @@ function App() {
       </div>
 
       <div className="actions">
-        <button className="btn btn-primary" onClick={() => window.location.reload()}>
+        <button className="btn btn-primary" onClick={handleRefresh}>
           🔄 Atualizar Lista
         </button>
       </div>
 
-      <ChainhooksList />
+      <ChainhooksList ref={chainhooksListRef} />
     </div>
   );
 }

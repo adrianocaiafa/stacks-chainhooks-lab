@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { showContractCall } from '@stacks/connect';
 import { StacksMainnet, StacksTestnet } from '@stacks/transactions';
 import ChainhookItem from './ChainhookItem';
 import './ChainhooksList.css';
 
-interface Chainhook {
+export interface Chainhook {
   uuid: string;
   definition: {
     name: string;
@@ -26,14 +26,14 @@ interface Chainhook {
   };
 }
 
-function ChainhooksList() {
+export interface ChainhooksListHandle {
+  reload: () => void;
+}
+
+const ChainhooksList = forwardRef<ChainhooksListHandle>((_props, ref) => {
   const [chainhooks, setChainhooks] = useState<Chainhook[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    loadChainhooks();
-  }, []);
 
   const loadChainhooks = async () => {
     setLoading(true);
@@ -146,7 +146,9 @@ function ChainhooksList() {
       ))}
     </div>
   );
-}
+});
+
+ChainhooksList.displayName = 'ChainhooksList';
 
 export default ChainhooksList;
 
