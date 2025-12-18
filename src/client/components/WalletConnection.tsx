@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { showConnect } from '@stacks/connect';
-import { StacksMainnet, StacksTestnet } from '@stacks/transactions';
 import './WalletConnection.css';
 
 interface UserData {
