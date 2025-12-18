@@ -33,11 +33,6 @@ app.use(express.json());
 
 // API Routes - devem vir antes do static para não serem sobrescritas
 
-// Rota para servir a página HTML
-app.get('/', (_req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
-});
-
 // API: Listar todos os chainhooks com suporte a paginação
 app.get('/api/chainhooks', async (req, res) => {
   try {
