@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chainhooks Manager</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "@stacks/connect": "/node_modules/@stacks/connect/dist/index.mjs",
+        "@stacks/transactions": "/node_modules/@stacks/transactions/dist/esm/index.js",
+        "@stacks/auth": "/node_modules/@stacks/auth/dist/esm/index.js",
+        "@stacks/network": "/node_modules/@stacks/transactions/node_modules/@stacks/network/dist/esm/index.js",
+        "@stacks/common": "/node_modules/@stacks/transactions/node_modules/@stacks/common/dist/esm/index.js",
+        "@stacks/encryption": "/node_modules/@stacks/encryption/dist/esm/index.js"
+      }
+    }
+  </script>
   <style>
     * {
       margin: 0;
@@ -230,9 +242,9 @@
     // Carrega/verifica Stacks Connect usando arquivos locais do node_modules
     async function loadStacksConnect() {
       try {
-        // Importa dos arquivos servidos localmente pelo Express
-        const stacksConnectModule = await import('/node_modules/@stacks/connect/dist/index.mjs');
-        const stacksTransactionsModule = await import('/node_modules/@stacks/transactions/dist/esm/index.js');
+        // Importa usando import map para resolver dependências
+        const stacksConnectModule = await import('@stacks/connect');
+        const stacksTransactionsModule = await import('@stacks/transactions');
         
         return {
           showConnect: stacksConnectModule.showConnect,
