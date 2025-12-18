@@ -42,6 +42,7 @@ const ChainhooksList = forwardRef<ChainhooksListHandle>((_props, ref) => {
     setLoading(true);
     setError(null);
     try {
+      console.log('Carregando chainhooks...');
       const response = await fetch('/api/chainhooks');
       
       if (!response.ok) {
@@ -49,11 +50,13 @@ const ChainhooksList = forwardRef<ChainhooksListHandle>((_props, ref) => {
       }
       
       const result = await response.json();
+      console.log('Resposta da API:', result);
 
       if (!result.success) {
         throw new Error(result.error || 'Erro ao carregar chainhooks');
       }
 
+      console.log('Chainhooks carregados:', result.data?.length || 0);
       setChainhooks(result.data || []);
     } catch (err) {
       console.error('Erro ao carregar chainhooks:', err);
