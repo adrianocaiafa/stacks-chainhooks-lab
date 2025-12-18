@@ -230,9 +230,9 @@
     // Carrega/verifica Stacks Connect usando arquivos locais do node_modules
     async function loadStacksConnect() {
       try {
-        // Importa dos arquivos servidos localmente pelo Express
-        const stacksConnectModule = await import('/node_modules/@stacks/connect/dist/index.js');
-        const stacksTransactionsModule = await import('/node_modules/@stacks/transactions/dist/index.js');
+        // Importa dos arquivos servidos localmente pelo Express (usando .mjs que é módulo ES)
+        const stacksConnectModule = await import('/node_modules/@stacks/connect/dist/index.mjs');
+        const stacksTransactionsModule = await import('/node_modules/@stacks/transactions/dist/index.mjs');
         
         return {
           showConnect: stacksConnectModule.showConnect,
