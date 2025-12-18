@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { showConnect, getUserSession } from '@stacks/connect';
+import { showConnect, UserSession, AppConfig } from '@stacks/connect';
 import './WalletConnection.css';
 
 interface UserData {
@@ -7,24 +7,21 @@ interface UserData {
   profile?: any;
 }
 
+const appConfig = new AppConfig(['store_write', 'publish_data']);
+const userSession = new UserSession({ appConfig });
+
 function WalletConnection() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Verifica se já existe uma sessão ativa
-    try {
-      const session = getUserSession();
-      if (session && session.isUserSignedIn()) {
-        const userData = session.loadUserData();
-        const address = userData.profile?.stxAddress?.mainnet || userData.profile?.stxAddress?.testnet;
-        setUserData({ profile: userData.profile, address });
-      }
-    } catch (error) {
-      console.log('Nenhuma sessão ativa');
-    } finally {
-      setLoading(false);
+    if (userSession.isUserSignedIn()) {
+      const userData = userSession.loadUserData();
+      const address = userData.profile?.stxAddress?.mainnet || userData.profile?.stxAddress?.testnet;
+      setUserData({ profile: userData.profile, address });
     }
+    setLoading(false);
   }, []);
 
   const connectWallet = async () => {
@@ -34,10 +31,15 @@ function WalletConnection() {
           name: 'Chainhooks Lab',
           icon: window.location.origin + '/favicon.ico',
         },
-        onFinish: (data) => {
-          const address = data.profile?.stxAddress?.mainnet || data.profile?.stxAddress?.testnet;
-          setUserData({ ...data, address });
+        onFinish: () => {
+          const userData = userSession.loadUserData();
+          const address = userData.profile?.stxAddress?.mainnet || userData.profile?.stxAddress?.testnet;
+          setUserData({ profile: userData.profile, address });
         },
+        onCancel: () => {
+          console.log('Conexão cancelada');
+        },
+        userSession,
       });
     } catch (error) {
       console.error('Erro ao conectar carteira:', error);
@@ -45,17 +47,9 @@ function WalletConnection() {
     }
   };
 
-  const disconnectWallet = async () => {
-    try {
-      const session = getUserSession();
-      if (session) {
-        session.signUserOut();
-      }
-      setUserData(null);
-    } catch (error) {
-      console.error('Erro ao desconectar:', error);
-      setUserData(null);
-    }
+  const disconnectWallet = () => {
+    userSession.signUserOut();
+    setUserData(null);
   };
 
   if (loading) {
