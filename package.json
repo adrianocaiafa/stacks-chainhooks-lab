@@ -5,9 +5,12 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && vite build",
+    "build:server": "tsc",
+    "build:client": "vite build",
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
+    "dev:client": "vite",
     "server": "tsx src/server.ts",
     "test:quick": "tsx src/quick-test.ts",
     "clean": "rm -rf dist"
@@ -23,9 +26,13 @@
     "@types/node": "^20.10.0",
     "@types/express": "^4.17.21",
     "@types/cors": "^2.8.17",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
     "ts-node-dev": "^2.0.0",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vite": "^5.0.8"
   },
   "dependencies": {
     "@hirosystems/chainhooks-client": "^1.0.0",
@@ -34,6 +41,8 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "cors": "^2.8.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "undici": "^7.16.0"
   }
 }
