@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { showConnect, UserSession, AppConfig } from '@stacks/connect';
+import { showConnect } from '@stacks/connect';
+import { userSession } from '../stacksSession';
 import './WalletConnection.css';
 
 interface UserData {
   address?: string;
   profile?: any;
 }
-
-const appConfig = new AppConfig(['store_write', 'publish_data']);
-const userSession = new UserSession({ appConfig });
 
 function WalletConnection() {
   const [userData, setUserData] = useState<UserData | null>(null);

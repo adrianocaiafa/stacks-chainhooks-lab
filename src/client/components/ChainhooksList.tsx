@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
-import { showContractCall, UserSession, AppConfig } from '@stacks/connect';
+import { showContractCall } from '@stacks/connect';
 import { StacksMainnet, StacksTestnet } from '@stacks/network-v6';
+import { userSession } from '../stacksSession';
 import ChainhookItem from './ChainhookItem';
 import './ChainhooksList.css';
-
-const appConfig = new AppConfig(['store_write', 'publish_data']);
-const userSession = new UserSession({ appConfig });
 
 export interface Chainhook {
   uuid: string;
