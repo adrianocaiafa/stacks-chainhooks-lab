@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { showContractCall } from '@stacks/connect';
-import { StacksMainnet, StacksTestnet } from '@stacks/network';
+import { StacksNetwork } from '@stacks/network';
 import ChainhookItem from './ChainhookItem';
 import './ChainhooksList.css';
 
