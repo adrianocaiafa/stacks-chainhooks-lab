@@ -91,7 +91,20 @@ app.get('/api/chainhooks/:uuid', async (req, res) => {
 });
 
 // Inicia o servidor na porta especificada
+// Servir arquivos estáticos do build do React (em produção)
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../dist/client')));
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(__dirname, '../dist/client/index.html'));
+  });
+}
+
+// Inicia o servidor na porta especificada
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+  console.log(`🚀 Servidor API rodando em http://localhost:${PORT}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`📱 Frontend React disponível em http://localhost:5173 (via Vite)`);
+    console.log(`💡 Execute 'npm run dev' para rodar tudo junto!`);
+  }
 });
 
