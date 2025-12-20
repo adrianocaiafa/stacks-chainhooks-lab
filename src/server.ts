@@ -85,6 +85,46 @@ app.get('/api/chainhooks/:uuid', async (req, res) => {
   }
 });
 
+// Endpoint para buscar interface do contrato (funções públicas)
+app.get('/api/contracts/:address/:name/interface', async (req, res) => {
+  try {
+    const { address, name } = req.params;
+    const network = (req.query.network as string) || 'mainnet';
+    
+    // API base URL da Stacks
+    const apiBaseUrl = network === 'mainnet' 
+      ? 'https://api.hiro.so'
+      : 'https://api.testnet.hiro.so';
+    
+    const response = await fetch(`${apiBaseUrl}/v2/contracts/interface/${address}/${name}`);
+    
+    if (!response.ok) {
+      throw new Error(`Erro ao buscar interface do contrato: ${response.statusText}`);
+    }
+    
+    const contractInterface = await response.json();
+    
+    // Filtra apenas funções públicas (não read-only)
+    const publicFunctions = (contractInterface.functions || []).filter(
+      (fn: any) => fn.access === 'public' || fn.access === 'private'
+    );
+    
+    res.json({ 
+      success: true, 
+      data: {
+        functions: publicFunctions,
+        contractInterface
+      }
+    });
+  } catch (error: any) {
+    console.error('Erro ao buscar interface do contrato:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || 'Erro ao buscar interface do contrato' 
+    });
+  }
+});
+
 // Inicia o servidor na porta especificada
 // Servir arquivos estáticos do build do React (em produção)
 if (process.env.NODE_ENV === 'production') {
