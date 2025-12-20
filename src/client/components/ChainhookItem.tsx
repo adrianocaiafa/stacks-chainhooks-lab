@@ -73,9 +73,12 @@ function ChainhookItem({ chainhook, onDelete, onCallFunction }: ChainhookItemPro
         const result = await response.json();
         if (result.success && result.data.functions) {
           setPublicFunctions(result.data.functions);
+        } else if (!result.success) {
+          console.warn('Contrato não encontrado ou sem funções públicas:', result.error);
         }
       } catch (error) {
         console.error('Erro ao carregar funções do contrato:', error);
+        // Não define erro de estado para não quebrar a UI, apenas loga
       } finally {
         setLoadingFunctions(false);
       }

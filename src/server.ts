@@ -104,11 +104,14 @@ app.get('/api/contracts/:address/:name/interface', async (req, res) => {
     const sourceResponse = await fetch(sourceUrl);
     
     if (!sourceResponse.ok) {
+      const errorText = await sourceResponse.text();
       console.error(`[API] Erro ao buscar source code: ${sourceResponse.status} ${sourceResponse.statusText}`);
-      throw new Error(`Contrato não encontrado: ${sourceResponse.statusText}`);
+      console.error(`[API] Resposta do erro:`, errorText);
+      throw new Error(`Contrato não encontrado: ${sourceResponse.statusText} (${sourceResponse.status})`);
     }
     
     const contractSource = await sourceResponse.json();
+    console.log(`[API] Source code encontrado, extraindo funções...`);
     
     // Se o source code não tiver a interface definida, tenta buscar a interface diretamente
     let contractInterface = contractSource;
@@ -137,6 +140,7 @@ app.get('/api/contracts/:address/:name/interface', async (req, res) => {
       publicFunctions = (contractInterface.functions || []).filter(
         (fn: any) => fn.access === 'public'
       );
+      console.log(`[API] Encontradas ${publicFunctions.length} funções públicas na interface`);
     } else if (contractSource.source) {
       // Se não tiver interface, tenta extrair do source code (parse básico)
       // Para Clarity, funções públicas começam com (define-public
@@ -149,6 +153,9 @@ app.get('/api/contracts/:address/:name/interface', async (req, res) => {
         access: 'public',
         args: []
       }));
+      console.log(`[API] Extraídas ${publicFunctions.length} funções públicas do source code`);
+    } else {
+      console.warn(`[API] Nenhum source code ou interface encontrado para o contrato`);
     }
     
     res.json({ 
@@ -160,6 +167,15 @@ app.get('/api/contracts/:address/:name/interface', async (req, res) => {
     });
   } catch (error: any) {
     console.error('[API] Erro ao buscar interface do contrato:', error);
+    
+    // Se o erro for 404, retorna um erro mais amigável
+    if (error.message && error.message.includes('404') || error.message.includes('Not Found')) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Contrato não encontrado. Verifique se o contrato está implantado na rede especificada.' 
+      });
+    }
+    
     res.status(500).json({ 
       success: false, 
       error: error.message || 'Erro ao buscar interface do contrato' 
