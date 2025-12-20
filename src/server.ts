@@ -96,29 +96,70 @@ app.get('/api/contracts/:address/:name/interface', async (req, res) => {
       ? 'https://api.hiro.so'
       : 'https://api.testnet.hiro.so';
     
-    const response = await fetch(`${apiBaseUrl}/v2/contracts/interface/${address}/${name}`);
+    // Primeiro tenta buscar o source code do contrato
+    // Endpoint: GET /v2/contracts/source/{contract_address}/{contract_name}
+    const sourceUrl = `${apiBaseUrl}/v2/contracts/source/${address}/${name}`;
+    console.log(`[API] Buscando source code do contrato: ${sourceUrl}`);
     
-    if (!response.ok) {
-      throw new Error(`Erro ao buscar interface do contrato: ${response.statusText}`);
+    const sourceResponse = await fetch(sourceUrl);
+    
+    if (!sourceResponse.ok) {
+      console.error(`[API] Erro ao buscar source code: ${sourceResponse.status} ${sourceResponse.statusText}`);
+      throw new Error(`Contrato não encontrado: ${sourceResponse.statusText}`);
     }
     
-    const contractInterface = await response.json();
+    const contractSource = await sourceResponse.json();
     
-    // Filtra apenas funções públicas (que podem ser chamadas via transações)
-    // Funções read-only (access: 'read_only') não alteram estado e não são incluídas
-    const publicFunctions = (contractInterface.functions || []).filter(
-      (fn: any) => fn.access === 'public'
-    );
+    // Se o source code não tiver a interface definida, tenta buscar a interface diretamente
+    let contractInterface = contractSource;
+    
+    if (!contractSource.functions) {
+      // Tenta buscar a interface separadamente
+      const interfaceUrl = `${apiBaseUrl}/v2/contracts/interface/${address}/${name}`;
+      console.log(`[API] Buscando interface do contrato: ${interfaceUrl}`);
+      
+      const interfaceResponse = await fetch(interfaceUrl);
+      
+      if (interfaceResponse.ok) {
+        contractInterface = await interfaceResponse.json();
+      } else {
+        // Se não encontrar interface, extrai do source code
+        console.log('[API] Interface não encontrada, usando source code');
+        contractInterface = contractSource;
+      }
+    }
+    
+    // Extrai funções públicas do source code ou da interface
+    let publicFunctions: any[] = [];
+    
+    if (contractInterface.functions) {
+      // Se tiver funções na interface, usa elas
+      publicFunctions = (contractInterface.functions || []).filter(
+        (fn: any) => fn.access === 'public'
+      );
+    } else if (contractSource.source) {
+      // Se não tiver interface, tenta extrair do source code (parse básico)
+      // Para Clarity, funções públicas começam com (define-public
+      const sourceCode = contractSource.source;
+      const publicFunctionRegex = /\(define-public\s+\(([a-zA-Z0-9-_]+)/g;
+      const matches = [...sourceCode.matchAll(publicFunctionRegex)];
+      
+      publicFunctions = matches.map(match => ({
+        name: match[1],
+        access: 'public',
+        args: []
+      }));
+    }
     
     res.json({ 
       success: true, 
       data: {
         functions: publicFunctions,
-        contractInterface
+        contractInterface: contractInterface
       }
     });
   } catch (error: any) {
-    console.error('Erro ao buscar interface do contrato:', error);
+    console.error('[API] Erro ao buscar interface do contrato:', error);
     res.status(500).json({ 
       success: false, 
       error: error.message || 'Erro ao buscar interface do contrato' 
