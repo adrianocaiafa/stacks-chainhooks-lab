@@ -9,22 +9,10 @@
  * - Ter acesso à API de Chainhooks da Hiro
  */
 
-import { ChainhooksClient, CHAINHOOKS_BASE_URL } from '@hirosystems/chainhooks-client';
-import * as dotenv from 'dotenv';
+import { createChainhooksClient } from './utils';
 
-// Carrega variáveis de ambiente do arquivo .env
-dotenv.config();
-
-// Valida se a API key foi fornecida
-if (!process.env.HIRO_API_KEY) {
-  throw new Error('HIRO_API_KEY não encontrada no arquivo .env');
-}
-
-// Configura o cliente Chainhooks para mainnet
-const client = new ChainhooksClient({
-  baseUrl: CHAINHOOKS_BASE_URL.mainnet,
-  apiKey: process.env.HIRO_API_KEY,
-});
+// Cria o cliente Chainhooks
+const client = createChainhooksClient();
 
 // Configuração do chainhook
 const CONTRACT_IDENTIFIER = 'SP1RSWVNQ7TW839J8V22E9JBHTW6ZQXSNR67HTZE9.simple-gm';
