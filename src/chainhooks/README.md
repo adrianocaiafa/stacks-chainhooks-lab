@@ -10,7 +10,7 @@ Cada arquivo neste diretório representa um chainhook específico que monitora e
 
 - **`contract-call-simple-gm.ts`**: Monitora chamadas à função `gm` do contrato `simple-gm`
 - **`contract-deploy.ts`**: Monitora deploys de contratos na mainnet (opcionalmente filtra por deployer)
-- **`contract-log-simple-reaction.ts`**: Monitora logs/prints do contrato `simple-reaction` (like, dislike, clear-reaction)
+- **`contract-log-simple-reaction.ts`**: Monitora logs/prints do contrato `simple-reactions` (like, dislike, clear-reaction)
 
 ## Como Usar
 
