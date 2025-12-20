@@ -104,9 +104,10 @@ app.get('/api/contracts/:address/:name/interface', async (req, res) => {
     
     const contractInterface = await response.json();
     
-    // Filtra apenas funções públicas (não read-only)
+    // Filtra apenas funções públicas (que podem ser chamadas via transações)
+    // Funções read-only (access: 'read_only') não alteram estado e não são incluídas
     const publicFunctions = (contractInterface.functions || []).filter(
-      (fn: any) => fn.access === 'public' || fn.access === 'private'
+      (fn: any) => fn.access === 'public'
     );
     
     res.json({ 
