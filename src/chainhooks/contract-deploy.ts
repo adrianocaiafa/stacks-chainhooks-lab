@@ -1,8 +1,8 @@
 /**
  * Chainhook: Contract Deploy
  * 
- * Registra um chainhook que monitora todos os deploys de contratos na mainnet da Stacks.
- * Opcionalmente, pode filtrar por um deployer específico usando o campo `sender`.
+ * Registra um chainhook que monitora deploys de contratos do deployer específico
+ * (SP1RSWVNQ7TW839J8V22E9JBHTW6ZQXSNR67HTZE9) na mainnet da Stacks.
  * 
  * Requisitos:
  * - Configurar HIRO_API_KEY no arquivo .env
