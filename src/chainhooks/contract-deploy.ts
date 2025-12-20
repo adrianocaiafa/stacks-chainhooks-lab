@@ -32,7 +32,7 @@ try {
   console.log(`Registrando chainhook para monitorar: ${filterDescription}`);
   
   // Constrói o filtro baseado na configuração
-  const eventFilter: { type: string; sender?: string } = {
+  const eventFilter: { type: 'contract_deploy'; sender?: string } = {
     type: 'contract_deploy',
   };
   
