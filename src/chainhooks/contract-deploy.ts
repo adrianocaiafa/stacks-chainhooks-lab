@@ -11,7 +11,7 @@
  * Referência: https://docs.hiro.so/en/tools/chainhooks/reference/filters#contract-deploy
  */
 
-import { createChainhooksClient } from './utils';
+import { createChainhooksClient, DEPLOYER_ADDRESS } from './utils';
 
 // Cria o cliente Chainhooks
 const client = createChainhooksClient();
@@ -19,26 +19,9 @@ const client = createChainhooksClient();
 // Configuração do chainhook
 const WEBHOOK_URL = 'https://webhook-test.com/52771ab55148dc5fa1e399c8e41d4c11';
 
-// Opcional: filtrar por deployer específico (deixe null para monitorar todos os deploys)
-// Exemplo: const DEPLOYER = 'SP000000000000000000002Q6VF78';
-const DEPLOYER: string | null = null;
-
 // Registra e habilita o chainhook
 try {
-  const filterDescription = DEPLOYER 
-    ? `deploys do deployer ${DEPLOYER}`
-    : 'todos os deploys de contratos';
-  
-  console.log(`Registrando chainhook para monitorar: ${filterDescription}`);
-  
-  // Constrói o filtro baseado na configuração
-  const eventFilter: { type: 'contract_deploy'; sender?: string } = {
-    type: 'contract_deploy',
-  };
-  
-  if (DEPLOYER) {
-    eventFilter.sender = DEPLOYER;
-  }
+  console.log(`Registrando chainhook para monitorar deploys do deployer ${DEPLOYER_ADDRESS}`);
   
   const chainhook = await client.registerChainhook({
     version: '1',
@@ -46,7 +29,12 @@ try {
     chain: 'stacks',
     network: 'mainnet',
     filters: {
-      events: [eventFilter],
+      events: [
+        {
+          type: 'contract_deploy',
+          sender: DEPLOYER_ADDRESS,
+        },
+      ],
     },
     action: {
       type: 'http_post',
@@ -62,7 +50,7 @@ try {
 
   console.log('✅ Chainhook criado com sucesso!');
   console.log('UUID:', chainhook.uuid);
-  console.log('Monitorando:', filterDescription);
+  console.log('Monitorando deploys do deployer:', DEPLOYER_ADDRESS);
 } catch (error) {
   console.error('❌ Erro ao criar chainhook:', error);
   process.exit(1);
