@@ -13,7 +13,7 @@
     "dev:server": "tsx watch src/server.ts",
     "dev:client": "vite",
     "server": "tsx src/server.ts",
-    "test:quick": "tsx src/quick-test.ts",
+    "chainhook:simple-gm": "tsx src/chainhooks/contract-call-simple-gm.ts",
     "clean": "rm -rf dist"
   },
   "keywords": [
