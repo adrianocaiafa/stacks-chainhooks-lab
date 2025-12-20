@@ -8,6 +8,10 @@ import * as dotenv from 'dotenv';
 // Carrega variáveis de ambiente
 dotenv.config();
 
+// Constantes compartilhadas
+export const DEPLOYER_ADDRESS = 'SP1RSWVNQ7TW839J8V22E9JBHTW6ZQXSNR67HTZE9';
+export const CONTRACT_SIMPLE_GM = `${DEPLOYER_ADDRESS}.simple-gm`;
+
 /**
  * Cria uma instância do cliente Chainhooks configurada para mainnet
  * @throws {Error} Se HIRO_API_KEY não estiver configurada
