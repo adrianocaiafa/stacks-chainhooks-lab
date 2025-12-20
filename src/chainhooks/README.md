@@ -9,6 +9,7 @@ Cada arquivo neste diretório representa um chainhook específico que monitora e
 ### Scripts Disponíveis
 
 - **`contract-call-simple-gm.ts`**: Monitora chamadas à função `gm` do contrato `simple-gm`
+- **`contract-deploy.ts`**: Monitora deploys de contratos na mainnet (opcionalmente filtra por deployer)
 
 ## Como Usar
 
@@ -17,6 +18,9 @@ Execute os scripts usando npm:
 ```bash
 # Registra o chainhook para monitorar o contrato simple-gm
 npm run chainhook:simple-gm
+
+# Registra o chainhook para monitorar deploys de contratos
+npm run chainhook:deploy
 ```
 
 ## Requisitos
