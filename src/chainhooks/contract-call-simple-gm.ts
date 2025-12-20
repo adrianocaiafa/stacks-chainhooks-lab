@@ -9,19 +9,18 @@
  * - Ter acesso à API de Chainhooks da Hiro
  */
 
-import { createChainhooksClient } from './utils';
+import { createChainhooksClient, CONTRACT_SIMPLE_GM } from './utils';
 
 // Cria o cliente Chainhooks
 const client = createChainhooksClient();
 
 // Configuração do chainhook
-const CONTRACT_IDENTIFIER = 'SP1RSWVNQ7TW839J8V22E9JBHTW6ZQXSNR67HTZE9.simple-gm';
 const FUNCTION_NAME = 'gm';
 const WEBHOOK_URL = 'https://webhook-test.com/52771ab55148dc5fa1e399c8e41d4c11';
 
 // Registra e habilita o chainhook
 try {
-  console.log(`Registrando chainhook para monitorar: ${CONTRACT_IDENTIFIER}::${FUNCTION_NAME}`);
+  console.log(`Registrando chainhook para monitorar: ${CONTRACT_SIMPLE_GM}::${FUNCTION_NAME}`);
   
   const chainhook = await client.registerChainhook({
     version: '1',
@@ -32,7 +31,7 @@ try {
       events: [
         {
           type: 'contract_call',
-          contract_identifier: CONTRACT_IDENTIFIER,
+          contract_identifier: CONTRACT_SIMPLE_GM,
           function_name: FUNCTION_NAME,
         },
       ],
