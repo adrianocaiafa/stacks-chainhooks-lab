@@ -75,39 +75,49 @@ function ChainhookItem({ chainhook, onDelete, onCallFunction }: ChainhookItemPro
             <p>
               <strong>Eventos ({events.length}):</strong>
             </p>
-            {events.map((event, index) => (
-              <div key={index} className="event-details">
-                <p>
-                  <strong>Tipo:</strong> {event.type}
-                </p>
-                {event.contract_identifier && (
+            {events.map((event, index) => {
+              // Extrai contract_identifier do asset_identifier se necessário (para eventos FT)
+              let contractIdentifier = event.contract_identifier;
+              if (!contractIdentifier && event.asset_identifier) {
+                // asset_identifier tem formato: contract.contract_name::token
+                const parts = event.asset_identifier.split('::');
+                if (parts.length > 0) {
+                  contractIdentifier = parts[0];
+                }
+              }
+
+              return (
+                <div key={index} className="event-details">
                   <p>
-                    <strong>Contrato:</strong>{' '}
-                    <code className="code-block">{event.contract_identifier}</code>
+                    <strong>Tipo:</strong> {event.type}
                   </p>
-                )}
-                {event.function_name && (
-                  <p>
-                    <strong>Função:</strong> <code className="code-block">{event.function_name}</code>
-                  </p>
-                )}
-                {event.asset_identifier && (
-                  <p>
-                    <strong>Asset:</strong> <code className="code-block">{event.asset_identifier}</code>
-                  </p>
-                )}
-              </div>
-            ))}
+                  {contractIdentifier && (
+                    <p>
+                      <strong>Contrato:</strong>{' '}
+                      <code className="code-block">{contractIdentifier}</code>
+                    </p>
+                  )}
+                  {event.function_name && (
+                    <p>
+                      <strong>Função:</strong> <code className="code-block">{event.function_name}</code>
+                    </p>
+                  )}
+                  {event.asset_identifier && (
+                    <p>
+                      <strong>Asset:</strong> <code className="code-block">{event.asset_identifier}</code>
+                    </p>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
         <p>
           <strong>Ocorrências:</strong> {occurrenceCount}
         </p>
-        {evaluatedBlocks > 0 && (
-          <p>
-            <strong>Blocos avaliados:</strong> {evaluatedBlocks.toLocaleString()}
-          </p>
-        )}
+        <p>
+          <strong>Blocos avaliados:</strong> {evaluatedBlocks.toLocaleString()}
+        </p>
         <div className="chainhook-uuid">UUID: {chainhook.uuid}</div>
       </div>
       <div className="chainhook-actions">
