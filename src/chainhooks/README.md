@@ -15,6 +15,7 @@ Cada arquivo neste diretório representa um chainhook específico que monitora e
 - **`ft-monitoring-simple-token.ts`**: Monitora todos os eventos FT do token `simple-token` (transfer, mint, burn)
 - **`ft-monitoring-wizard-token.ts`**: Monitora todos os eventos FT do token `wizard-token` (transfer, mint, burn)
 - **`nft-monitoring-simple-nft.ts`**: Monitora todos os eventos NFT da coleção `simple-nft` (transfer, mint, burn)
+- **`nft-monitoring-wizard-card.ts`**: Monitora todos os eventos NFT da coleção `wizard-card` (transfer, mint, burn)
 
 ## Como Usar
 
@@ -41,6 +42,9 @@ npm run chainhook:ft-wizard
 
 # Registra chainhook para monitorar todos os eventos NFT do simple-nft (transfer, mint, burn)
 npm run chainhook:nft-monitoring
+
+# Registra chainhook para monitorar todos os eventos NFT do wizard-card (transfer, mint, burn)
+npm run chainhook:nft-wizard
 ```
 
 ## Requisitos
