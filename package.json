@@ -17,6 +17,7 @@
     "chainhook:deploy": "tsx src/chainhooks/contract-deploy.ts",
     "chainhook:simple-reaction-logs": "tsx src/chainhooks/contract-log-simple-reaction.ts",
     "chainhook:ft-monitoring": "tsx src/chainhooks/ft-monitoring-simple-token.ts",
+    "chainhook:ft-wizard": "tsx src/chainhooks/ft-monitoring-wizard-token.ts",
     "chainhook:nft-monitoring": "tsx src/chainhooks/nft-monitoring-simple-nft.ts",
     "clean": "rm -rf dist"
   },
