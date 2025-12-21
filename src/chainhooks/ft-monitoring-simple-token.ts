@@ -28,7 +28,8 @@ const client = createChainhooksClient();
 const WEBHOOK_URL = 'https://webhook-test.com/52771ab55148dc5fa1e399c8e41d4c11';
 
 // Asset identifier no formato: contract_address.contract_name::token_name
-const ASSET_IDENTIFIER = `${CONTRACT_SIMPLE_TOKEN}::simple-token`;
+// Para fungible tokens, o contrato geralmente é "ft" e não o nome do contrato
+const ASSET_IDENTIFIER = `${DEPLOYER_ADDRESS}.ft::simple-token`;
 
 // Registra e habilita o chainhook
 try {
