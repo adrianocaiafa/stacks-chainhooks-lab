@@ -12,6 +12,7 @@ interface Chainhook {
         type: string;
         contract_identifier?: string;
         function_name?: string;
+        asset_identifier?: string;
       }>;
     };
   };
@@ -90,15 +91,18 @@ function ChainhookItem({ chainhook, onDelete, onCallFunction }: ChainhookItemPro
                     <strong>Função:</strong> <code className="code-block">{event.function_name}</code>
                   </p>
                 )}
+                {event.asset_identifier && (
+                  <p>
+                    <strong>Asset:</strong> <code className="code-block">{event.asset_identifier}</code>
+                  </p>
+                )}
               </div>
             ))}
           </div>
         )}
-        {occurrenceCount > 0 && (
-          <p>
-            <strong>Ocorrências:</strong> {occurrenceCount}
-          </p>
-        )}
+        <p>
+          <strong>Ocorrências:</strong> {occurrenceCount}
+        </p>
         {evaluatedBlocks > 0 && (
           <p>
             <strong>Blocos avaliados:</strong> {evaluatedBlocks.toLocaleString()}
