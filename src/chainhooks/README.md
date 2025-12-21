@@ -12,6 +12,7 @@ Cada arquivo neste diretório representa um chainhook específico que monitora e
 - **`contract-deploy.ts`**: Monitora deploys de contratos na mainnet (opcionalmente filtra por deployer)
 - **`contract-log-simple-reaction.ts`**: Monitora logs/prints do contrato `simple-reactions` (like, dislike, clear-reaction)
 - **`ft-monitoring-simple-token.ts`**: Monitora todos os eventos FT do token `simple-token` (transfer, mint, burn)
+- **`nft-monitoring-simple-nft.ts`**: Monitora todos os eventos NFT da coleção `simple-nft` (transfer, mint, burn)
 
 ## Como Usar
 
@@ -29,6 +30,9 @@ npm run chainhook:simple-reaction-logs
 
 # Registra chainhook para monitorar todos os eventos FT do simple-token (transfer, mint, burn)
 npm run chainhook:ft-monitoring
+
+# Registra chainhook para monitorar todos os eventos NFT do simple-nft (transfer, mint, burn)
+npm run chainhook:nft-monitoring
 ```
 
 ## Requisitos
