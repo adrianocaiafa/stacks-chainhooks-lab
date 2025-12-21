@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import './ChainhookItem.css';
 
 interface Chainhook {
@@ -23,12 +23,6 @@ interface Chainhook {
   };
 }
 
-interface ContractFunction {
-  name: string;
-  access: string;
-  args: Array<{ name: string; type: string }>;
-}
-
 interface ChainhookItemProps {
   chainhook: Chainhook;
   onDelete: (uuid: string) => void;
@@ -46,48 +40,6 @@ function ChainhookItem({ chainhook, onDelete, onCallFunction }: ChainhookItemPro
 
   const contractCallEvents = events.filter((e) => e.type === 'contract_call');
   const firstContractCall = contractCallEvents[0];
-  
-  // Buscar funções públicas quando o evento for contract_log
-  const contractLogEvents = events.filter((e) => e.type === 'contract_log');
-  const firstContractLog = contractLogEvents[0];
-  const [publicFunctions, setPublicFunctions] = useState<ContractFunction[]>([]);
-  const [loadingFunctions, setLoadingFunctions] = useState(false);
-
-  useEffect(() => {
-    const loadContractFunctions = async () => {
-      if (!firstContractLog?.contract_identifier) return;
-      
-      try {
-        setLoadingFunctions(true);
-        const [contractAddress, contractName] = firstContractLog.contract_identifier.split('.');
-        const network = definition.network || 'mainnet';
-        
-        const response = await fetch(
-          `/api/contracts/${contractAddress}/${contractName}/interface?network=${network}`
-        );
-        
-        if (!response.ok) {
-          throw new Error('Erro ao buscar funções do contrato');
-        }
-        
-        const result = await response.json();
-        if (result.success && result.data.functions) {
-          setPublicFunctions(result.data.functions);
-        } else if (!result.success) {
-          console.warn('Contrato não encontrado ou sem funções públicas:', result.error);
-        }
-      } catch (error) {
-        console.error('Erro ao carregar funções do contrato:', error);
-        // Não define erro de estado para não quebrar a UI, apenas loga
-      } finally {
-        setLoadingFunctions(false);
-      }
-    };
-
-    if (firstContractLog) {
-      loadContractFunctions();
-    }
-  }, [firstContractLog, definition.network]);
 
   const handleDelete = () => {
     if (
@@ -155,7 +107,6 @@ function ChainhookItem({ chainhook, onDelete, onCallFunction }: ChainhookItemPro
         <div className="chainhook-uuid">UUID: {chainhook.uuid}</div>
       </div>
       <div className="chainhook-actions">
-        {/* Botão para contract_call */}
         {firstContractCall && firstContractCall.contract_identifier && firstContractCall.function_name && (
           <button
             className="btn btn-success"
@@ -166,28 +117,6 @@ function ChainhookItem({ chainhook, onDelete, onCallFunction }: ChainhookItemPro
             ⚡ Chamar {firstContractCall.function_name}
           </button>
         )}
-        
-        {/* Botões para contract_log - exibe funções públicas do contrato */}
-        {firstContractLog && firstContractLog.contract_identifier && (
-          <div className="contract-functions-section">
-            {loadingFunctions ? (
-              <p className="loading-functions">Carregando funções...</p>
-            ) : publicFunctions.length > 0 ? (
-              publicFunctions.map((fn) => (
-                <button
-                  key={fn.name}
-                  className="btn btn-success"
-                  onClick={() =>
-                    onCallFunction(firstContractLog.contract_identifier!, fn.name, definition.network || 'mainnet')
-                  }
-                >
-                  ⚡ Chamar {fn.name}
-                </button>
-              ))
-            ) : null}
-          </div>
-        )}
-        
         <button className="btn btn-danger" onClick={handleDelete}>
           🗑️ Deletar
         </button>
