@@ -56,6 +56,7 @@ const ChainhooksList = forwardRef<ChainhooksListHandle>((_props, ref) => {
       }
 
       console.log('Chainhooks carregados:', result.data?.length || 0);
+      console.log('Dados dos chainhooks:', result.data);
       setChainhooks(result.data || []);
     } catch (err) {
       console.error('Erro ao carregar chainhooks:', err);

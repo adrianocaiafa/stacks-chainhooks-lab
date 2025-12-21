@@ -35,8 +35,9 @@ function ChainhookItem({ chainhook, onDelete, onCallFunction }: ChainhookItemPro
   const name = definition.name || 'Sem nome';
   const isEnabled = status.enabled !== false;
   const statusText = status.status || 'unknown';
-  const occurrenceCount = status.occurrence_count || 0;
-  const evaluatedBlocks = status.evaluated_block_count || 0;
+  // Garante que lemos os valores corretamente, mesmo se vierem como null/undefined
+  const occurrenceCount = status.occurrence_count !== undefined && status.occurrence_count !== null ? status.occurrence_count : 0;
+  const evaluatedBlocks = status.evaluated_block_count !== undefined && status.evaluated_block_count !== null ? status.evaluated_block_count : 0;
   const events = definition.filters?.events || [];
 
   const contractCallEvents = events.filter((e) => e.type === 'contract_call');
