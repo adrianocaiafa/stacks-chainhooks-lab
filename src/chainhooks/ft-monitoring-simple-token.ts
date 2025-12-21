@@ -19,7 +19,7 @@
  * - https://docs.hiro.so/en/tools/chainhooks/reference/filters#ft-burn
  */
 
-import { createChainhooksClient, CONTRACT_SIMPLE_TOKEN } from './utils';
+import { createChainhooksClient, DEPLOYER_ADDRESS } from './utils';
 
 // Cria o cliente Chainhooks
 const client = createChainhooksClient();
