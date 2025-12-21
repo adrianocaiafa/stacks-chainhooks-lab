@@ -16,6 +16,7 @@ export interface Chainhook {
         type: string;
         contract_identifier?: string;
         function_name?: string;
+        asset_identifier?: string;
       }>;
     };
   };
